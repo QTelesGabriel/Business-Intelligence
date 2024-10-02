@@ -10,8 +10,8 @@ def create_user(session, name, email):
 
 def create_task(session, task, priority, status, userID):
     with session:
-        nova_task = Task(created=datetime.now(), updated=datetime.now(), task=task, priority=priority, status=status, userID=userID)
-        session.add(nova_task)
+        new_task = Task(created=datetime.now(), updated=datetime.now(), task=task, priority=priority, status=status, userID=userID)
+        session.add(new_task)
         session.commit()
         print(f"Tarefa '{task}' adicionada com sucesso para o usuário {userID}.")
 
