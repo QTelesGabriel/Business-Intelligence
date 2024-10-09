@@ -1,4 +1,5 @@
 from data_models.models import User, Task
+from sqlalchemy import update
 from datetime import datetime
 
 def create_user(session, name, email):
@@ -19,6 +20,10 @@ def read_user(session, id):
     with session:
         return session.query(User).filter_by(id=id).first()
 
+def read_users(session):
+    with session:
+        return session.query(User).all()
+
 def list_user(session, userID):
     with session:
         user = read_user(session, userID)
@@ -37,6 +42,10 @@ def read_task(session, id):
     with session:
         return session.query(Task).filter_by(id=id).first()
 
+def read_tasks(session):
+    with session:
+        return session.query(Task).all()
+
 def list_task(session, taskID):
     with session:
         task = read_task(session, taskID)
@@ -47,7 +56,7 @@ def list_task(session, taskID):
 
 def list_all_tasks(session):
     with session:
-        tasks = session.query(Task).all()
+        tasks = read_tasks(session)
         for task in tasks:
             print(f"ID: {task.id}, Tarefa: {task.task}, Prioridade: {task.priority}, Status: {task.status}, Atualizado em: {task.updated}, Usuário ID: {task.userID}")
 
@@ -55,19 +64,24 @@ def update_user(session, userID, new_name, new_email):
     with session:
         user = read_user(session, userID)
         if user:
-            user.name = new_name
-            user.email = new_email
+            stmt = (
+                update(User).
+                where(User.id == userID).
+                values(name=new_name, email=new_email)
+            )
+            session.execute(stmt)
             session.commit()
     
 def update_task(session, taskID, new_task, new_priority, new_status, new_userID):
     with session:
         task = read_task(session, taskID)
         if task:
-            task.task = new_task
-            task.priority = new_priority
-            task.status = new_status
-            task.userID = new_userID
-            task.updated = datetime.now()
+            stmt = (
+                update(Task).
+                where(Task.id == taskID).
+                values(task=new_task, priority=new_priority, status=new_status, userID=new_userID)
+            )
+            session.execute(stmt)
             session.commit()
 
 def delete_user(session, id):
